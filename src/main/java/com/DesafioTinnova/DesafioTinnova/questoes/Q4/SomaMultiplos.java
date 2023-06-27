@@ -1,4 +1,4 @@
-package com.DesafioTinnova.DesafioTinnova.Q4;
+package com.DesafioTinnova.DesafioTinnova.questoes.Q4;
 
 public class SomaMultiplos {
 

@@ -1,4 +1,4 @@
-package com.DesafioTinnova.DesafioTinnova.Q1;
+package com.DesafioTinnova.DesafioTinnova.questoes.Q1;
 
 public class Eleicao {
     private int totalEleitores;

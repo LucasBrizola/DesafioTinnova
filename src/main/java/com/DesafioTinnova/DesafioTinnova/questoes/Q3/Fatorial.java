@@ -1,4 +1,4 @@
-package com.DesafioTinnova.DesafioTinnova.Q3;
+package com.DesafioTinnova.DesafioTinnova.questoes.Q3;
 
 public class Fatorial {
 

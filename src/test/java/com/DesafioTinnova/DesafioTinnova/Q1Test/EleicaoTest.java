@@ -1,6 +1,6 @@
 package com.DesafioTinnova.DesafioTinnova.Q1Test;
 
-import com.DesafioTinnova.DesafioTinnova.Q1.Eleicao;
+import com.DesafioTinnova.DesafioTinnova.questoes.Q1.Eleicao;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

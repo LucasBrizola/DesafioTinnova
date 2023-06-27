@@ -1,6 +1,6 @@
 package com.DesafioTinnova.DesafioTinnova.Q2Test;
 
-import com.DesafioTinnova.DesafioTinnova.Q2.BubbleSort;
+import com.DesafioTinnova.DesafioTinnova.questoes.Q2.BubbleSort;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

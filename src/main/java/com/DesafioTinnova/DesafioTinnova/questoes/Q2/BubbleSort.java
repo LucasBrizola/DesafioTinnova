@@ -1,4 +1,4 @@
-package com.DesafioTinnova.DesafioTinnova.Q2;
+package com.DesafioTinnova.DesafioTinnova.questoes.Q2;
 
 public class BubbleSort {
     private int[] vetor;
