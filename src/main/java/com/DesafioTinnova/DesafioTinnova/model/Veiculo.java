@@ -2,6 +2,7 @@ package com.DesafioTinnova.DesafioTinnova.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -15,10 +16,13 @@ public class Veiculo {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
+    @NotBlank
     private String veiculo;
     @Column(nullable = false)
+    @NotBlank
     private String marca;
     @Column(nullable = false)
+    @NotBlank
     private Integer ano;
     private String descricao;
     private boolean vendido;
