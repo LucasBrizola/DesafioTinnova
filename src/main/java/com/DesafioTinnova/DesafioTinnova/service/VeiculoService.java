@@ -2,12 +2,17 @@ package com.DesafioTinnova.DesafioTinnova.service;
 
 import com.DesafioTinnova.DesafioTinnova.model.Veiculo;
 import com.DesafioTinnova.DesafioTinnova.repository.VeiculoRepository;
+import com.DesafioTinnova.DesafioTinnova.service.exception.DateWrongException;
 import com.DesafioTinnova.DesafioTinnova.service.exception.VeiculoMissingValueException;
 import com.DesafioTinnova.DesafioTinnova.service.exception.VeiculoNotFoundException;
 import com.DesafioTinnova.DesafioTinnova.service.exception.VeiculosEmptyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 
 @Service
@@ -33,15 +38,72 @@ public class VeiculoService {
         ) {
             throw new VeiculoMissingValueException();
         }
+        if(veiculo.getAno() < LocalDateTime.now().getYear() - 100 || veiculo.getAno() > LocalDateTime.now().getYear()){
+            throw new DateWrongException();
+        }
         veiculo.setCreated();
         return true;
     }
 
-    public List<Veiculo> findAll() {
-        List<Veiculo> lista = this.veiculoRepository.findAll();
+    public Map<String, Object> findAll(int page, int size) {
+        List<Veiculo> lista;
+        Pageable paging = PageRequest.of(page, size);
+
+        Page<Veiculo> pageVeiculos = veiculoRepository.findAll(paging);
+        lista = pageVeiculos.getContent();
+
         if (lista.isEmpty()) {
             throw (new VeiculosEmptyException());
-        } else return lista;
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("veiculos", lista);
+        response.put("veiculos não vendidos na base", contaVendidos());
+        response.put("veiculos veiculos por fabricante", contaMarca());
+        response.put("veiculos por década", contarVeiculosPorDecada());
+        response.put("página atual", pageVeiculos.getNumber());
+        response.put("itens totais", pageVeiculos.getTotalElements());
+        response.put("páginas totais", pageVeiculos.getTotalPages());
+
+        return response;
+    }
+
+    private long contaVendidos() {
+        List<Veiculo> veiculos = veiculoRepository.findAll();
+        return veiculos.stream().filter(Veiculo::isVendido).count();
+    }
+
+    private long contaMarca() {
+        List<Veiculo> veiculos = veiculoRepository.findAll();
+        return veiculos.stream().filter(veiculo -> "ferrari".equals(veiculo.getMarca())).count();
+    }
+
+    public Map<String, String> contarVeiculosPorDecada() {
+        List<Veiculo> veiculos = veiculoRepository.findAll();
+        List<String> listaDecadas = new ArrayList<>();
+        String decada;
+
+        for (Veiculo veiculo : veiculos) {
+            Integer ano = veiculo.getAno();
+            if (ano < 2000) {
+                decada = Integer.toString(ano - 1900);
+
+            }
+            else{
+                decada = Integer.toString(ano - 2000);
+            }
+            decada = String.valueOf(decada.charAt(0)).concat("0");
+            listaDecadas.add(decada);
+        }
+
+        HashMap<String, String> map = new HashMap<>();
+
+        for (String valor : listaDecadas) {
+            long count = listaDecadas.stream().filter(valor::equals).count();
+            map.put("Década de " + valor + ": ", count + " veículos");
+        }
+
+        return map;
     }
 
     public Veiculo findById(Long id) {

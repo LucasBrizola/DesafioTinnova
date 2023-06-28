@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -45,8 +45,10 @@ public class VeiculoController {
                             schema = @Schema(implementation = Veiculo.class))}),
             @ApiResponse(responseCode = "500", description = "sem veiculos cadastrados")})
     @GetMapping
-    public ResponseEntity<List<Veiculo>> findAll() {
-        List<Veiculo> veiculos = veiculoService.findAll();
+    public ResponseEntity<Map<String, Object>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size) {
+        Map<String, Object> veiculos = veiculoService.findAll(page, size);
         return new ResponseEntity<>(veiculos, HttpStatus.OK);
     }
 

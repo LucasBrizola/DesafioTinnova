@@ -11,5 +11,4 @@ public interface VeiculoRepository extends JpaRepository<Veiculo, Long> {
 
     @Override
     Optional<Veiculo> findById(Long id);
-    Optional<Veiculo> findByVeiculo(String veiculo);
 }
