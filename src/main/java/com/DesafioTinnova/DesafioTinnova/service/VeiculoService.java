@@ -1,17 +1,18 @@
 package com.DesafioTinnova.DesafioTinnova.service;
 
+import com.DesafioTinnova.DesafioTinnova.model.Marca;
 import com.DesafioTinnova.DesafioTinnova.model.Veiculo;
+import com.DesafioTinnova.DesafioTinnova.repository.MarcaRepository;
 import com.DesafioTinnova.DesafioTinnova.repository.VeiculoRepository;
-import com.DesafioTinnova.DesafioTinnova.service.exception.DateWrongException;
-import com.DesafioTinnova.DesafioTinnova.service.exception.VeiculoMissingValueException;
-import com.DesafioTinnova.DesafioTinnova.service.exception.VeiculoNotFoundException;
-import com.DesafioTinnova.DesafioTinnova.service.exception.VeiculosEmptyException;
+import com.DesafioTinnova.DesafioTinnova.service.exception.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 
@@ -20,9 +21,12 @@ public class VeiculoService {
 
     private final VeiculoRepository veiculoRepository;
 
+    private final MarcaRepository marcaRepository;
 
-    public VeiculoService(VeiculoRepository veiculoRepository) {
+
+    public VeiculoService(VeiculoRepository veiculoRepository, MarcaRepository marcaRepository) {
         this.veiculoRepository = veiculoRepository;
+        this.marcaRepository = marcaRepository;
     }
 
     public Veiculo save(Veiculo veiculo) {
@@ -38,11 +42,22 @@ public class VeiculoService {
         ) {
             throw new VeiculoMissingValueException();
         }
-        if(veiculo.getAno() < LocalDateTime.now().getYear() - 100 || veiculo.getAno() > LocalDateTime.now().getYear()){
+        if (veiculo.getAno() < LocalDateTime.now().getYear() - 100 || veiculo.getAno() > LocalDateTime.now().getYear()) {
             throw new DateWrongException();
         }
-        veiculo.setCreated();
-        return true;
+        veiculo.setMarca(veiculo.getMarca().toLowerCase());
+        List<Marca> marcas = marcaRepository.findAll();
+        boolean flag = false;
+        for (Marca marca : marcas) {
+            if (marca.getName().equals(veiculo.getMarca())) {
+                flag = true;
+                break;
+            }
+        }
+        if(flag){
+            veiculo.setCreated();
+            return flag;
+        }else throw new MarcaNotExistException(veiculo.getMarca());
     }
 
     public Map<String, Object> findAll(int page, int size) {
@@ -58,24 +73,32 @@ public class VeiculoService {
 
         Map<String, Object> response = new HashMap<>();
         response.put("veiculos", lista);
-        response.put("veiculos não vendidos na base", contaVendidos());
-        response.put("veiculos veiculos por fabricante", contaMarca());
+        response.put("veiculos não vendidos na base", contaNaoVendidos());
+        response.put("veiculos por fabricante", contaMarcas());
         response.put("veiculos por década", contarVeiculosPorDecada());
-        response.put("página atual", pageVeiculos.getNumber());
+        response.put("veiculos cadastrados esta semana", exibirVeiculosUltimaSemana());
+        response.put("página atual", pageVeiculos.getNumber()+1);
         response.put("itens totais", pageVeiculos.getTotalElements());
         response.put("páginas totais", pageVeiculos.getTotalPages());
 
         return response;
     }
 
-    private long contaVendidos() {
+    private long contaNaoVendidos() {
         List<Veiculo> veiculos = veiculoRepository.findAll();
-        return veiculos.stream().filter(Veiculo::isVendido).count();
+        return veiculos.stream().filter(veiculo -> !veiculo.isVendido()).count();
     }
 
-    private long contaMarca() {
+    private Map<String, Long> contaMarcas() {
+        List<Marca> marcas = marcaRepository.findAll();
         List<Veiculo> veiculos = veiculoRepository.findAll();
-        return veiculos.stream().filter(veiculo -> "ferrari".equals(veiculo.getMarca())).count();
+        HashMap<String, Long> map = new HashMap<>();
+
+        for (Marca marca : marcas) {
+            long count = veiculos.stream().filter(veiculo -> marca.getName().equals(veiculo.getMarca())).count();
+            map.put("veiculos " + marca.getName() + ": ", count);
+        }
+        return map;
     }
 
     public Map<String, String> contarVeiculosPorDecada() {
@@ -88,8 +111,7 @@ public class VeiculoService {
             if (ano < 2000) {
                 decada = Integer.toString(ano - 1900);
 
-            }
-            else{
+            } else {
                 decada = Integer.toString(ano - 2000);
             }
             decada = String.valueOf(decada.charAt(0)).concat("0");
@@ -104,6 +126,11 @@ public class VeiculoService {
         }
 
         return map;
+    }
+
+    public List<Veiculo> exibirVeiculosUltimaSemana() {
+        long DAY_IN_MS = 1000 * 60 * 60 * 24;
+        return veiculoRepository.findByCreatedBetween(new Date(System.currentTimeMillis() - (7 * DAY_IN_MS)), new Date(System.currentTimeMillis()));
     }
 
     public Veiculo findById(Long id) {
