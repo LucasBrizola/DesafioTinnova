@@ -13,7 +13,8 @@ public class Marca {
     @Id
     private String name;
 
-    public Marca(){}
+    public Marca() {
+    }
 
     public String getName() {
         return name;

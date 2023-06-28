@@ -13,7 +13,7 @@ public class Veiculo {
 
     @Id
     @Column(nullable = false)
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     @NotBlank
@@ -28,14 +28,21 @@ public class Veiculo {
     private boolean vendido;
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(style = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private Date created;
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(style = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private Date updated;
 
     public Veiculo() {
+    }
+
+    private Veiculo(VeiculoBuilder builder) {
+        this.veiculo = builder.veiculo;
+        this.marca = builder.marca;
+        this.ano = builder.ano;
+        this.descricao = builder.descricao;
     }
 
     public void setId(Long id) {
@@ -82,10 +89,6 @@ public class Veiculo {
         return vendido;
     }
 
-    public void setVendido(boolean vendido) {
-        this.vendido = vendido;
-    }
-
     public Date getCreated() {
         return created;
     }
@@ -100,5 +103,42 @@ public class Veiculo {
 
     public void setUpdated() {
         this.updated = new Date(System.currentTimeMillis());
+    }
+
+    public static class VeiculoBuilder {
+        private Long id;
+        private String veiculo;
+        private String marca;
+        private Integer ano;
+        private String descricao;
+        private boolean vendido;
+        private Date created;
+        private Date updated;
+
+        public VeiculoBuilder(String veiculo, String marca, Integer ano, String descricao) {
+            this.veiculo = veiculo;
+            this.marca = marca;
+            this.ano = ano;
+            this.descricao = descricao;
+        }
+
+        public VeiculoBuilder setVendido(boolean vendido) {
+            this.vendido = vendido;
+            return this;
+        }
+
+        public VeiculoBuilder setCreated(Date created) {
+            this.created = created;
+            return this;
+        }
+
+        public VeiculoBuilder setUpdated(Date updated) {
+            this.updated = updated;
+            return this;
+        }
+
+        public Veiculo build() {
+            return new Veiculo(this);
+        }
     }
 }
