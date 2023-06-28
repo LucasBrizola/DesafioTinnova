@@ -1,6 +1,6 @@
 package com.DesafioTinnova.DesafioTinnova.Q4Test;
 
-import com.DesafioTinnova.DesafioTinnova.Q4.SomaMultiplos;
+import com.DesafioTinnova.DesafioTinnova.questoes.Q4.SomaMultiplos;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

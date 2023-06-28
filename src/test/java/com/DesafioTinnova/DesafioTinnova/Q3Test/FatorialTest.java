@@ -1,6 +1,6 @@
 package com.DesafioTinnova.DesafioTinnova.Q3Test;
 
-import com.DesafioTinnova.DesafioTinnova.Q3.Fatorial;
+import com.DesafioTinnova.DesafioTinnova.questoes.Q3.Fatorial;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
